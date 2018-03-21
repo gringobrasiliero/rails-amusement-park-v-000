@@ -4,12 +4,13 @@ class AttractionsController < ApplicationController
   # GET /attractions
   # GET /attractions.json
   def index
-    @attractions = Attraction.all
+    @user = current_user
   end
 
   # GET /attractions/1
   # GET /attractions/1.json
   def show
+    @attraction = Attraction.find(params[:id])
   end
 
   # GET /attractions/new
@@ -69,6 +70,6 @@ class AttractionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def attraction_params
-      params.fetch(:attraction, {})
+     params.require(:attraction).permit(:name, :tickets, :nausea_rating, :happiness_rating, :min_height )
     end
 end
