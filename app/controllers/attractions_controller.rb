@@ -1,5 +1,5 @@
 class AttractionsController < ApplicationController
-  before_action :set_attraction, only: [:show, :edit, :update, :destroy]
+  before_action :get_attraction, only: [:show, :edit, :update, :destroy]
 
   # GET /attractions
   # GET /attractions.json
@@ -11,6 +11,7 @@ class AttractionsController < ApplicationController
   # GET /attractions/1.json
   def show
     @attraction = Attraction.find(params[:id])
+    @user = current_user
   end
 
   # GET /attractions/new
@@ -20,8 +21,20 @@ class AttractionsController < ApplicationController
 
   # GET /attractions/1/edit
   def edit
+    get_attraction
   end
 
+  def ride
+    get_attraction
+    @user = User.find(session[:user_id])
+      ride = Ride.new(user_id: session[:user_id], attraction_id: params[:id])
+    if ride.take_ride == true
+      flash[:message] = "Thanks for riding the #{@attraction.name}!"
+    else
+      flash[:message] = ride.take_ride
+    end
+      redirect_to user_path(@user)
+    end
   # POST /attractions
   # POST /attractions.json
   def create
@@ -64,10 +77,10 @@ class AttractionsController < ApplicationController
 
   private
     # Use callbacks to share common setup or constraints between actions.
-    def set_attraction
-      @attraction = Attraction.find(params[:id])
-    end
 
+    def get_attraction
+      @attraction = Attraction.find(params[:id])
+      end
     # Never trust parameters from the scary internet, only allow the white list through.
     def attraction_params
      params.require(:attraction).permit(:name, :tickets, :nausea_rating, :happiness_rating, :min_height )
